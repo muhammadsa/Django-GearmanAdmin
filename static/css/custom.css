@@ -1,0 +1,32 @@
+﻿.t{
+
+    float: left;
+    margin-left: 20px;
+    margin-top: 20px;
+    border: solid 1px;
+    width: 450px
+}
+
+.row{
+    margin-left: 5px;
+
+}
+
+
+#beforefoo{
+    display: none;
+    color: red;
+    position: fixed;
+    right: 25px;
+    bottom: 5px;
+}
+#foo{
+    color: red;
+    position: fixed;
+    right: 10px;
+    bottom: 5px;
+}
+
+.col-lg-4 {
+    width: 50.333333%;
+}

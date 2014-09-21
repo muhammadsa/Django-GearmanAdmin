@@ -1,0 +1,9 @@
+{%for worker in value.status_response %}
+    <b>task: </b> {{worker.task}}<br />
+    subscribed workers count: {{worker.workers}}<br/>
+    running workers: {{worker.running}}<br />
+    
+    queued workers: {{worker.queued}} <br />
+<hr style="border: solid 1px" />
+    <br />
+{%endfor%}

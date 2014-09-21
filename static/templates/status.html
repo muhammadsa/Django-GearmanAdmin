@@ -1,0 +1,15 @@
+{%extends "base.html" %}
+{%block content %}
+{# workers subscribed for a specific server(s) #}
+{#{{target_server}}#}
+{%include "server_info.html" with value=target_server%} {#don't show status lnk#}
+{%include "status_info.html" with value=target_server%}
+{%endblock%}
+
+{%block autorefresh%}
+{%if auto_refresh and auto_refresh != -1%}
+$(document).ready(function(){
+test({{auto_refresh}});
+});
+{%endif%}
+{%endblock%}

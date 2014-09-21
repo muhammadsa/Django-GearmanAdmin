@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+<br />
+{% if error %}
+    error .. {{ error }}
+{% else %}
+    {%for worker in workers %}
+        desc: {{worker.file_descriptor}} <br />
+        tasks: {%if worker.tasks %}<br />
+        {%for task in worker.tasks%}
+        name: {{task}} <br />
+        {%endfor%}
+         {%else%} No registered tasks {%endif%}<br />
+        client_id: {%if not worker.client_id or worker.client_id = '-' %}  Not specified {%else%} {{worker.client_id}} {%endif%}<br />
+        hosted_ip: {{worker.ip}} <br />
+        <hr style='border: solid 1px' />
+    {%endfor%}
+{% endif %}
+{% endblock %}
+

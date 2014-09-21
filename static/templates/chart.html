@@ -1,0 +1,69 @@
+
+<script type="text/javascript" src="{{STATIC_URL}}js/jscharts.js"></script>
+<div class="t">
+
+{#{% with "shop/"|add:shop_name|add:"/base.html" as template %}#}
+{%with server_id=value.server.id|stringformat:"s" %}
+    {% with server_id|add:"_"|add:value.server.filter_basis as s %}
+        {%include "filter_basis.html" with id=value.server.id|stringformat:"s" selected=s %}
+    {%endwith%}
+{%endwith%}
+<div id="chartcontainer{{value.server.id}}" >Loading ...</div>
+
+</div>
+<script type="text/javascript">
+
+function drawServerChart(serverId, myData, down_times, chartContainerId, day){
+
+
+var myChart = new JSChart(chartContainerId, 'line');
+myChart.setDataArray(myData);
+myChart.setAxisNameX('');
+myChart.setAxisNameY('');
+myChart.setAxisValuesAngle(45);
+myChart.setAxisPaddingBottom(50);
+myChart.setSize(450{#length#}, 400);
+myChart.setTitle('Response times of ' + serverId + ' for ' + day);
+
+if (down_times != null && down_times != '' && down_times  != 'undefined'){
+        var $down_times = new Array(down_times);
+        //console.log(down_times);
+        for(var i=0; i< $down_times.length; i++){
+           myChart.setTooltip($down_times[i]);
+        }
+}
+
+myChart.draw();
+
+}
+
+//alert({{value.history | safe}});
+var myData = new Array{{value.history | safe}};
+var myChart = new JSChart('chartcontainer{{value.server.id}}', 'line');
+myChart.setDataArray(myData);
+myChart.setAxisNameX('');
+myChart.setAxisNameY('');
+myChart.setAxisValuesAngle(45);
+myChart.setAxisPaddingBottom(50);
+myChart.setSize(450{#length#}, 400);
+myChart.setTitle('Response times of {{value.server.host}}:{{value.server.port_no}} for today');
+    {%if value.down_times  %}
+        var down_times{{value.server.id}} = new Array({{value.down_times | safe}});
+        //console.log(down_times);
+        for(var i=0; i< down_times{{value.server.id}}.length; i++){
+           myChart.setTooltip(down_times{{value.server.id}}[i]);
+        }
+    {%endif%}
+myChart.draw();
+
+</script>
+
+
+
+ <style>
+
+#chartcontainer{{value.server.id}} div{
+display: none;
+}
+
+</style>

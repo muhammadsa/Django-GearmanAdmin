@@ -1,0 +1,76 @@
+server info: <br />
+-------------<br />
+{{value.server.id}} <br />
+name: {{value.server.server_name}} <br />
+host: {{value.server.host}} <br />
+port: {{value.server.port_no}} <br />
+-----------------<br />
+healthy: {%if value.version %} YES {%else%} NO {%endif%} <br />
+version: {%if value.version %} {{value.version}} {%else%} N/A {%endif%}<br />
+response_time:  {%if value.response_time != '' %} {{value.response_time}} {%else%} N/A {%endif%} <br />
+{#status: {{value.status_response}} <br />#}
+<br />
+{#value.down_times#}
+{#workers info#}
+<br />
+{%if status_info %} 
+{%include "status_info.html" with value=value status_info=status_info%}
+{%endif%}
+-----------------<br />
+
+{%if show_graph%}
+<script type="text/javascript" src="{{STATIC_URL}}js/jscharts.js"></script>
+
+{%if show_filter %}
+<div class="btn-toolbar" role="toolbar">
+      <div class="btn-group">
+<button type="button" class="btn btn-default"><span class="">Currently</span></button>                
+<button type="button" class="btn btn-default"><span class="">Hourly</span></button>        
+        <button type="button" class="btn btn-default"><span class="">Daily</span></button>
+        <button type="button" class="btn btn-default"><span class="">Weekly</span></button>
+        <button type="button" class="btn btn-default"><span class="">Monthly</span></button>
+        
+      </div>
+</div>
+{%endif%}
+
+<div id="chartcontainer{{value.server.id}}">Loading ...</div>
+<script type="text/javascript">
+var myData = new Array{{value.history | safe}};
+var myChart = new JSChart('chartcontainer{{value.server.id}}', 'line');
+myChart.setDataArray(myData);
+myChart.setAxisNameX('');
+myChart.setAxisNameY('');
+myChart.setAxisValuesAngle(45);
+myChart.setAxisPaddingBottom(50);
+myChart.setSize(1024, 400);
+myChart.setTitle('Response times of gearman job server in {{value.server.host}}:{{value.server.port_no}} for today');
+    {%if value.down_times  %}
+        var down_times{{value.server.id}} = new Array({{value.down_times | safe}});
+        //console.log(down_times);
+        for(var i=0; i< down_times{{value.server.id}}.length; i++){
+           myChart.setTooltip(down_times{{value.server.id}}[i]);
+        }
+    {%endif%}
+
+myChart.draw();
+</script>
+{%endif%}
+
+{%if show_status%}
+<a href={% url "status" value.server.id %} alt='get_status'>status</a>
+{%endif%}
+
+{%if value.response_time != '' %}
+<a href={% url "sdown" id=value.server.id %} alt='shutdown'>shutdown</a>
+
+<a href={% url "sdown" grace="grace/" id=value.server.id %} alt='shutdown(graceful=true)'>shutdown (gracefully)</a>
+
+<a href={% url "workers" value.server.id %} alt='get_workers'>workers</a>
+{%endif%}
+
+{%if show_del%}
+<a href={% url "del_server" value.server.id %} alt='del'>delete</a>
+{%endif%}
+
+

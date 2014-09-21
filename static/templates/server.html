@@ -1,0 +1,14 @@
+{%extends "base.html" %}
+{%block content %}
+{% include "server_info.html" with value=target_server status_info=1 show_graph=1 %}
+
+path: {{request.path}}
+{%endblock%}
+
+{%block autorefresh%}
+{%if auto_refresh and aut_ref != -1%}
+$(document).ready(function(){
+test({{auto_refresh}});
+});
+{%endif%}
+{%endblock%}
