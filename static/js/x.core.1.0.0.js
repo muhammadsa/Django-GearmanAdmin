@@ -1,7 +1,36 @@
-﻿isDebugMode = true;
+﻿var isDebugMode = true;
+
+//<script type="text/javascript">
+//xCore.loadScript("http://your.cdn.com/second.js", function(){
+//    //initialization code
+//});
+//</script>
+
 
 var xCore = {
+    //load javascript without blocking (at runtime..and also whenever needed only.)
+    loadScript: function (url, callback) {
 
+        var script = document.createElement("script")
+        script.type = "text/javascript";
+
+        if (script.readyState) {  //IE
+            script.onreadystatechange = function () {
+                if (script.readyState == "loaded" ||
+                    script.readyState == "complete") {
+                    script.onreadystatechange = null;
+                    callback();
+                }
+            };
+        } else {  //Others
+            script.onload = function () {
+                callback();
+            };
+        }
+
+        script.src = url;
+        document.getElementsByTagName("head")[0].appendChild(script);
+    },
     invoke: function (runnable) {
         if (isDebugMode) {
             console.log('invoke: start');
@@ -10,7 +39,21 @@ var xCore = {
         if (runnable && runnable.run)
             $(document).ready(runnable.run);
     },
-
+    getCookie: function (name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie != '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = jQuery.trim(cookies[i]);
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    },
     setDebugMode: function () {
         isDebugMode = true;
     },
@@ -96,6 +139,7 @@ var xCore = {
     }
 };
 
+
 var xPosition = {
 
     centeralize: function (source, destination) {
@@ -154,9 +198,22 @@ var xPosition = {
 
 };
 
+function csrfSafeMethod(method) {
+    // these HTTP methods do not require CSRF protection
+    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+}
+
+var csrftoken = xCore.getCookie('csrftoken');
+
+$.ajaxSetup({
+    beforeSend: function (xhr, settings) {
+        if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+            xhr.setRequestHeader("X-CSRFToken", csrftoken);
+        }
+    }
+});
+
 var xAjax = {
-
-
 
     finalizeErrorProcess: function (response, onError, onComplete) {
         if (isDebugMode) {
@@ -343,7 +400,7 @@ var xAjax = {
 
 
     },
-
+    // using jQuery
     post2: function (requestUrl, data, loadingImage, centralizeLoaderImage, loadTarget, onSuccess, onError, onComplete) {
         if (isDebugMode) {
             console.log('post2: start');
@@ -361,7 +418,8 @@ var xAjax = {
             if (centralizeLoaderImage == true)
                 try {
                     xPosition.centeralize(loadTarget, loadingImage);
-                } catch (ex) {
+                }
+                catch (ex) {
                 }
             else
                 loadingImage.css('display', 'inline');
@@ -410,9 +468,9 @@ var xAjax = {
                             onError(response);
                         else {
                             if (isDebugMode) {
-                                 //response.status
+                                //response.status
                                 //response.responseText
-                                console.log("Ajax Request Failed" + thrownError );
+                                console.log("Ajax Request Failed" + thrownError);
                                 //xCore.errorHandler.showError('response is: ' + response);
                             }
                         }
@@ -526,3 +584,43 @@ var xAjax = {
     }
 };
 
+(function ($) {
+    var last_counter_time = 0;
+
+    $.fn.counter = function (options) {
+
+        var defaults = {
+            start: 0,
+            end: 10,
+            time: 10,
+            step: 1000,
+            callback: function () {
+            }
+        }
+        var options = $.extend(defaults, options);
+
+        var counterFunc = function (el, increment, end, step) {
+            var value = parseInt(el.html(), 10) + increment;
+            if (value >= end) {
+                el.html(Math.round(end));
+                options.callback();
+            } else {
+                el.html(Math.round(value));
+                setTimeout(counterFunc, step, el, increment, end, step);
+            }
+        }
+
+        $(this).html(Math.round(options.start));
+        var increment = (options.end - options.start) / ((1000 / options.step) * options.time);
+
+        (function (e, i, o, s) {
+            if(isDebugMode) console.log("last_counter_time " + last_counter_time);
+            if (parseInt(last_counter_time ) > 0) {
+                if(isDebugMode) console.log("clearing last counter time");
+                clearTimeout(last_counter_time);
+            }
+            last_counter_time  = setTimeout(counterFunc, s, e, i, o, s);
+
+        })($(this), increment, options.end, options.step);
+    }
+})(jQuery);
