@@ -93,18 +93,14 @@
         </div>
         <div class="collapse navbar-collapse">
             <ul class="nav navbar-nav">
-                <li><a href="http://gearman.org/download/" target="_blank">Download Gearman</a></li>
                 <li><a href="/about">About</a></li>
-
             </ul>
             <ul class="nav navbar-nav navbar-right">
 
-{#                <li><a href="#">Link</a></li>#}
+                {#                <li><a href="#">Link</a></li>#}
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">Actions<span class="caret"></span></a>
                     <ul class="dropdown-menu" role="menu">
-
-
                         <li><a class="refresh" rate="10" id="refresh_10" href="#">Refresh (10s)</a></li>
                         <li><a class="refresh" rate="20" id="refresh_20" href="#">Refresh (20s)</a></li>
                         <li><a class="refresh" rate="30" id="refresh_30" href="#">Refresh
@@ -120,6 +116,13 @@
                         <li><a class="" href={% url "servers" %}>All servers</a></li>
 
                         <li><a class="" id="add_server" href={% url "add_server" %}>Add server</a></li>
+                    </ul>
+                </li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Download<span class="caret"></span></a>
+                    <ul class="dropdown-menu" role="menu">
+                        <li><a href="//gearman.org/download/" target="_blank">Gearman</a></li>
+                        <li><a href="//github.com/muhammadsa/Django-GearmanAdmin" target="_blank">Gearman Admin</a></li>
                     </ul>
                 </li>
             </ul>
@@ -165,7 +168,7 @@
     <hr>
 
     <footer>
-        <p>&copy; SpaceGit co. Apache2 License 2014</p>
+        <p>&copy; Apache2 License {% now "Y" %}</p>
     </footer>
 
 </div>
