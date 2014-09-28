@@ -16,8 +16,10 @@ urlpatterns = patterns('GearmanMonitor.views',
                        url(r'^sdown/(?P<grace>.*/)?(?P<server_id>\d+)$', 'shutdown', {}, name='sdown'),
                        url(r"workers/(?P<server_id>.*?)$", 'get_workers', {'template': 'workers.html'}, name='workers'),
                        url(r'refresh/(?P<rate>.*?)$', 'refresh', {}, name='refresh'),
+                       url(r'refresh_script/(?P<rate>.*?)$', 'refresh_script', {}, name='refresh_script'),
                        url(r'^summary/$', 'summary', {'template': 'summary.html'}, name='summary'),
-                       url(r'^sfilter/(?P<filter>.*)$', 'sfilter', {'template': 'sfilter.html'}, name='sfilter'),
+                       url(r'^sfilter/(?P<filter_info>.*)$', 'sfilter', {'template': 'sfilter.html'}, name='sfilter'),
+                       url(r'^about$', 'aboutme', {'template': 'about.html'}, name='aboutme'),
 
                        # Uncomment the next line to enable the admin:
                        url(r'^admin/', include(admin.site.urls)),
@@ -33,17 +35,18 @@ urlpatterns += patterns('GearmanMonitor.auth_views',
                         )
 
 urlpatterns += patterns('',
-                       url(r'^auth/login/$', 'django.contrib.auth.views.login', {'template_name': 'tests/login.html'},
-                           name='login'),
+                        url(r'^auth/login/$', 'django.contrib.auth.views.login', {'template_name': 'tests/login.html'},
+                            name='login'),
                         )
 
 
 urlpatterns += patterns('GearmanMonitor.testviews',
-                       url(r'^login_test/$', 'test', {'template': 'tests/login.html'}, name='login'),
-                       url(r'^test/$', 'test', {'template': 'tests/test.html'}, name='test'),
-                       url(r'^test1/$', 'delaytest', {'template': 'tests/test1.html'}, name='test1'),
-                       url(r'^test_results/$', 'test_ajax'),
-                       url(r'^ajaxpost/$', 'ajaxpost'),
+                        url(r'^login_test/$', 'test', {'template': 'tests/login.html'}, name='login'),
+                        url(r'^test/input/$', 'test', {'template': 'tests/input.html'}, name='input'),
+                        url(r'^test/$', 'test', {'template': 'tests/test.html'}, name='test'),
+                        url(r'^test1/$', 'delaytest', {'template': 'tests/test1.html'}, name='test1'),
+                        url(r'^test_results/$', 'test_ajax'),
+                        url(r'^ajaxpost/$', 'ajaxpost'),
 
 
                         )
