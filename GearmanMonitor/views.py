@@ -1,4 +1,5 @@
 from django.shortcuts import render_to_response, redirect, Http404, HttpResponseRedirect
+from jsonresponse import to_json
 from django.template.context import RequestContext
 import gearman
 #from django.conf import settings
@@ -9,8 +10,10 @@ from .models import Server, RefreshRate, ServerHistory
 from django.db.models import Min
 from .forms import ServerForm
 from GearmanMonitor.models import filter_basis_options
+from django.shortcuts import HttpResponse
 import string
 import socket
+
 
 target_servers = {}
 
@@ -70,7 +73,7 @@ def servers(request, template="servers.html"):
 def server(request, template, server_id=0):
 
     server_id = get_valid_server_id(int(server_id))
-    fill_server_stats(server_id, history_length=50, forceFill=True)
+    fill_server_stats(server_id, history_length=50, force_fill=True)
 
     # version = ""
     # response_time = ""
@@ -102,11 +105,19 @@ def get_auto_refresh():
 
 def get_history(history_lst):
     lst = ()
-    for history in history_lst:
-        lst1 = ([str(history.created.hour) + ':' + str(history.created.minute) + ':' + str(history.created.second),
-                 float(history.response_time)],)
-        lst = lst1 + lst
-    return lst
+    # if len(history_lst) == 0:
+    #     return lst
+    if len(history_lst) == 1:
+        history = history_lst[0]
+        return str(([str(history.created.hour) + ':' + str(history.created.minute) + ':' + str(history.created.second),
+                 float(history.response_time)], [str(history.created.hour) + ':' + str(history.created.minute) + ':' + str(history.created.second),
+                 float(history.response_time)])).strip('()').strip(',')
+    else:
+        for history in history_lst:
+            lst1 = ([str(history.created.hour) + ':' + str(history.created.minute) + ':' + str(history.created.second),
+                     float(history.response_time)],)
+            lst = lst1 + lst
+        return str(lst).strip('()').strip(',')
 
 
 def get_down_times(history_lst):
@@ -120,7 +131,7 @@ def get_down_times(history_lst):
     return str(lstd).strip('()').strip(',')
 
 
-def fill_server_stats(server_id, history_length, forceFill=False):
+def fill_server_stats(server_id, history_length, force_fill=False):
         version = ""
         response_time = ""
         server_obj = Server(id=server_id)
@@ -131,9 +142,8 @@ def fill_server_stats(server_id, history_length, forceFill=False):
             #Retrieves the version number of the Gearman server
             version = target_servers[server_id]["conn"].get_version()
             #Sends off a debugging string to execute an application ping on the Gearman server
-            response_time = target_servers[server_id]["conn"].get_server_conn()
+            response_time = target_servers[server_id]["conn"].ping_server()
             #target_servers[server_id]["conn"].ping_server()
-
         except ConnectionError:
             health = False
             pass
@@ -141,11 +151,13 @@ def fill_server_stats(server_id, history_length, forceFill=False):
             health = False
             pass
 
+
         try:
             #saving in history
             history = ServerHistory(server=server_obj, healthy=health,
-                                    response_time=0.0 if response_time is None or response_time == '' else response_time
-                                    , version=version)
+                                    response_time=0.0 if response_time is None or response_time == ''
+                                    else response_time,
+                                    version=version)
             history.save()
         except DatabaseError:
             pass
@@ -181,16 +193,25 @@ def get_status(request, template, server_id=0):
     fill_target_servers()
     conn = get_server_conn(request, server_id)
     status_response = ""
+    err = None
     try:
+        socket.setdefaulttimeout(2)
         #Retrieves a list of all registered tasks and reports how many items/workers are in the queue
         status_response = conn.get_status()
+    except ConnectionError:
+        err = "connection error or timeout, we could not get any info from this server," \
+              " either to check this server or try again later"
+        pass
     except:
+        err = "something went wrong while getting workers, please make sure there is no connection" \
+              " issue with your server (ping server) or try again later"
         pass
 
+    server_id = int(server_id)
     target_servers[server_id]["status_response"] = status_response
 
     return render_to_response(template,
-                              {"target_server": target_servers[server_id], "auto_refresh": get_auto_refresh()},
+                              {"target_server": target_servers[server_id], "auto_refresh": get_auto_refresh(), "err": err},
                               context_instance=RequestContext(request))
 
 
@@ -207,10 +228,22 @@ def add_server(request, template='add_server.html'):
 
 
 def del_server(request, server_id):
-    server_obj = Server.objects.get(pk=server_id)
-    server_obj.delete()
+    if request.method == "POST":
+        server_obj = Server.objects.get(pk=server_id)
+        if not server_obj or server_obj is None:
+            message = '{"r":"false", "error": "NOT FOUND"}'
+            return HttpResponse(message, content_type="application/json")
+        else:
+            server_obj.delete()
 
-    return redirect("servers")
+        if request.is_ajax():
+            message = '{"r":"true", "via":"AJAX"}'
+        else:
+            message = '{"r":"true", "via": request["HTTP_USER_AGENT"]}'
+    else:
+        message = '{"r":"false", "error": "NOT ALLOWED"}'
+
+    return HttpResponse(message, content_type="application/json")
 
 
 def get_valid_server_id(server_id=None):
@@ -237,19 +270,33 @@ def get_server_conn(request, server_id=None):
 
     return target_servers[server_id]["conn"]
 
-
+@to_json('api')
 def shutdown(request, server_id, grace=None):
-    fill_target_servers()
 
+    if request.method != 'POST':
+        raise Exception("Not Allowed")
+
+    fill_target_servers()
     conn = get_server_conn(request, server_id)
+
+    if not conn:
+        raise Exception("connection is not established with gearmand server")
 
     if grace is not None and (grace == 'grace' or grace == 'grace/'):
         grace = True
     else:
         grace = False
 
-    conn.send_shutdown(graceful=grace)
-    return redirect("servers")
+    try:
+        socket.setdefaulttimeout(2)
+        #conn.send_shutdown(graceful=grace)
+    except:
+        raise Exception("can not execute command on gearmand server")
+
+    if request.is_ajax():
+        return dict(r=True, via='AJAX')
+    else:
+        return dict(r=True, via='HTTP')
 
 
 def get_workers(request, template, server_id):
@@ -261,14 +308,16 @@ def get_workers(request, template, server_id):
         socket.setdefaulttimeout(2)
         workers = conn.get_workers()
     except ConnectionError:
-        err = "connection error or timeout, we could not get any info from this server, either to check this server or try again later"
+        err = "connection error or timeout, we could not get any info from this server, " \
+              "either to check this server or try again later"
         pass
     except:
-        err = "something went wrong while getting workers, please make sure there is no connection issue with your server (ping server) or try again later"
+        err = "something went wrong while getting workers, please make sure there " \
+              "is no connection issue with your server (ping server) or try again later"
         pass
 
-
-    return render_to_response(template, {"workers": workers, "error": err}, context_instance=RequestContext(request))
+    return render_to_response(template, {"workers": workers, "error": err},
+                              context_instance=RequestContext(request))
 
 
 def redirect_previous_page(request):
@@ -310,16 +359,62 @@ def refresh(request, rate=-1):
     return redirect_previous_page(request)
 
 
+@to_json('api')
+def refresh_script(request, rate=-1):
+
+    if request.method != 'POST':
+        raise Exception("Not Allowed")
+
+    old_selected = None
+
+    try:
+        old_selected = RefreshRate.objects.get(is_selected=True)
+    except Exception:
+        #to bypass empty results
+        pass
+
+    if rate == '-1' or rate == '':
+        if old_selected:
+            try:
+                old_selected.is_selected = False
+                old_selected.save()
+            except DatabaseError:
+                raise Exception("Database error while disabling .. set old_selected = 0")
+
+        return dict(r=True, via='AJAX')
+
+    if old_selected and old_selected.rate_value == rate:
+        return dict(r=True, via='AJAX', affected=0)
+
+    if old_selected:
+        old_selected.is_selected = False
+        old_selected.save()
+
+    try:
+        target_rate = RefreshRate.objects.get(rate_value=rate)
+        target_rate.is_selected = True
+        target_rate.save()
+    except DatabaseError:
+        raise Exception("Database error while updating record")
+
+    #return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+    return dict(r=True, via='AJAX')
+
+
 def summary(request, template):
     data_length = 10
     fill_servers_stats(data_length)
     global target_servers
 
-    return render_to_response(template, {"target_servers": target_servers, "auto_refresh": get_auto_refresh(), 'length': data_length*1024/50 , "filter": filter_basis_options}, context_instance=RequestContext(request))
+    return render_to_response(template, {"target_servers": target_servers,
+                                         "auto_refresh": get_auto_refresh(),
+                                         'length': data_length*1024/50,
+                                         "filter": filter_basis_options},
+                              context_instance=RequestContext(request))
 
 
-def sfilter(request, filter, template):
-    lst = string.split(filter, '_', 2)
+def sfilter(request, filter_info, template):
+    lst = string.split(filter_info, '_', 2)
     #server = lst[0]
     #filter_basis = lst[1]
 
@@ -331,3 +426,7 @@ def sfilter(request, filter, template):
 
 def server_stats(request, template):
     fill_servers_stats()
+
+
+def aboutme(request, template):
+    return render_to_response(template, context_instance=RequestContext(request))
