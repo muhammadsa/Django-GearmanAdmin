@@ -6,12 +6,12 @@
 
 
 {%for key,value in target_servers.items %}
-      <div class="col-6 col-sm-6 col-lg-4">
-              <h2>{{ key }}</h2>
-              <p>Donec id elit non mi porta gravida at eget metus. </p>
-              <p><a class="btn btn-default" href="#" role="button">View details &raquo;</a></p>
+{#      <div class="col-6 col-sm-4 col-lg-4">#}
+{#              <h2>{{ key }}</h2>#}
+{#              <p>Donec id elit non mi porta gravida at eget metus. </p>#}
+{#              <p><a class="btn btn-default" href="#" role="button">View details &raquo;</a></p>#}
               {%include "chart.html" with value=value length=length counter=forloop.counter filters=filter_basis_options%}
-    </div>
+{#    </div>#}
 {%endfor%}
       </div><!--/span-->
 {%endblock%}

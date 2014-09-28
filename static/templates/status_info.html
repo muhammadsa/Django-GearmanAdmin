@@ -1,9 +1,28 @@
-{%for worker in value.status_response %}
-    <b>task: </b> {{worker.task}}<br />
-    subscribed workers count: {{worker.workers}}<br/>
-    running workers: {{worker.running}}<br />
-    
-    queued workers: {{worker.queued}} <br />
-<hr style="border: solid 1px" />
-    <br />
-{%endfor%}
+<table class="table table-bordered">
+    <tr>
+        <th colspan="2">Workers</th>
+    </tr>
+    {% if value.status_response|length %}
+        {% for worker in value.status_response %}
+            <tr>
+                <td><b>task: </b></td>
+                <td> {{ worker.task }}</td>
+            </tr>
+            <tr>
+                <td>subscribed workers count:</td>
+                <td>{{ worker.workers }}</td>
+            </tr>
+            <tr>
+                <td>running workers:</td>
+                <td>{{ worker.running }}</td>
+            </tr>
+            <tr>
+                <td>queued workers:</td>
+                <td>{{ worker.queued }}</td>
+            </tr>
+        {% endfor %}
+    {% else %}
+        <tr class="bg-warning"><td colspan="2">No workers here</td> </tr>
+    {% endif %}
+
+</table>

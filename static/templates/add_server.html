@@ -1,8 +1,26 @@
-{%extends "base.html" %} 
-{%block content%}
-<form method="POST" action="">
-{%csrf_token%}
-        {{form}}
-<input type="submit" value="Save" />
-</form>
-{%endblock%}
+<html>
+<head></head>
+<body>
+{% block content %}
+    <h4>Add server</h4><br />
+    <form method="POST" action="/add">
+        {% csrf_token %}
+        <table class="table">
+            {% for field in form.visible_fields %}
+                <tr>
+                    <td style="width: 50px">{{ field.name }} {{ field.help_text }}</td>
+                    <td>
+                        {{ field }}
+                        {{ field.errors }}
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+        <input type="submit" class="btn btn-primary" value="Save"/>
+
+        <input type="button" id="close_modal" class="btn btn-default modal_close" value="Cancel"/>
+
+    </form>
+{% endblock %}
+</body>
+</html>

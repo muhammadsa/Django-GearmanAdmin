@@ -38,7 +38,7 @@ myChart.draw();
 }
 
 //alert({{value.history | safe}});
-var myData = new Array{{value.history | safe}};
+var myData = new Array({{value.history | safe}});
 var myChart = new JSChart('chartcontainer{{value.server.id}}', 'line');
 myChart.setDataArray(myData);
 myChart.setAxisNameX('');

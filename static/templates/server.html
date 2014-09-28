@@ -1,8 +1,9 @@
 {%extends "base.html" %}
 {%block content %}
+<div class="servers">
 {% include "server_info.html" with value=target_server status_info=1 show_graph=1 %}
-
-path: {{request.path}}
+</div>
+{#path: {{request.path}}#}
 {%endblock%}
 
 {%block autorefresh%}

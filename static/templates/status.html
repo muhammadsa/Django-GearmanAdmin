@@ -1,15 +1,20 @@
-{%extends "base.html" %}
-{%block content %}
-{# workers subscribed for a specific server(s) #}
-{#{{target_server}}#}
-{%include "server_info.html" with value=target_server%} {#don't show status lnk#}
-{%include "status_info.html" with value=target_server%}
-{%endblock%}
+{#{%extends "base.html" %}#}
+{% block content %}
+    <div class="status">
+        {# workers subscribed for a specific server(s) #}
+        {#{{target_server}}#}
+        {% include "server_info.html" with value=target_server %} {#don't show status lnk#}
+        {% include "status_info.html" with value=target_server %}
+        {% include "sub/modal_close.html" %}
+    </div>
+    {#<script src="{{ STATIC_URL }}js/servers.js"></script>#}
 
-{%block autorefresh%}
-{%if auto_refresh and auto_refresh != -1%}
-$(document).ready(function(){
-test({{auto_refresh}});
-});
-{%endif%}
-{%endblock%}
+{% endblock %}
+
+{% block autorefresh %}
+    {% if auto_refresh and auto_refresh != -1 %}
+        $(document).ready(function(){
+        test({{ auto_refresh }});
+        });
+    {% endif %}
+{% endblock %}

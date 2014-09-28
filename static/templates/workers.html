@@ -1,20 +1,51 @@
-{% extends "base.html" %}
+{#{% extends "base.html" %}#}
 {% block content %}
-<br />
-{% if error %}
-    error .. {{ error }}
-{% else %}
-    {%for worker in workers %}
-        desc: {{worker.file_descriptor}} <br />
-        tasks: {%if worker.tasks %}<br />
-        {%for task in worker.tasks%}
-        name: {{task}} <br />
-        {%endfor%}
-         {%else%} No registered tasks {%endif%}<br />
-        client_id: {%if not worker.client_id or worker.client_id = '-' %}  Not specified {%else%} {{worker.client_id}} {%endif%}<br />
-        hosted_ip: {{worker.ip}} <br />
-        <hr style='border: solid 1px' />
-    {%endfor%}
-{% endif %}
+    <br/>
+    {% if error %}
+        error .. {{ error }}
+    {% else %}
+
+        {% if workers|length == 0 %}
+            <table class="table table-bordered">
+                <tr class="alert-warning">
+                    <td>No workers is currently registered with this server</td>
+                </tr>
+            </table>
+        {% else %}
+            {% for worker in workers %}
+                <table class="table table-bordered">
+                    <tr class="active">
+                        <td><b>Hosted IP</b></td>
+                        <td><b>{{ worker.ip }}</b></td>
+                    </tr>
+                    <tr>
+                        <td>Client Id:</td>
+                        <td> {% if not worker.client_id or worker.client_id == '-' %}  Not specified {% else %}
+                            {{ worker.client_id }} {% endif %}</td>
+                    </tr>
+                    <tr>
+                        <td>File Descriptor</td>
+                        <td>{{ worker.file_descriptor }}</td>
+                    </tr>
+                    <tr>
+
+                        <td>Registered Tasks:</td>
+                        {% if worker.tasks %}
+                            <td>
+                                {% for task in worker.tasks %}
+                                    name: {{ task }} <br/>
+                                {% endfor %}
+                            </td>
+                        {% else %}
+                            <td>No registered tasks</td>
+                        {% endif %}
+                    </tr>
+                </table>
+            {% endfor %}
+        {% endif %}
+
+    {% endif %}
+    {% include "sub/modal_close.html" %}
+
 {% endblock %}
 

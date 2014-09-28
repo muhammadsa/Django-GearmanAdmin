@@ -1,26 +1,24 @@
-{%extends "base.html"%}
-{%block content %}
+{% extends "base.html" %}
+{% block content %}
+{#    <style>#}
+{#        #chartcontainer div {#}
+{#            display: none;#}
+{#        }#}
+{#    </style>#}
+    {% include "sub/confirm.html" %}
 
-<style>
-#chartcontainer div{
-display: none;
-}
-
-</style>
+    {% for key,value in target_servers.items %}
+        {#server_info#}
+        {% include "server_info.html" with value=value show_filter=1 show_status=1 show_del=1 show_graph=1 %}
+    {% endfor %}
 
 
+{% endblock %}
 
-{% for key,value in target_servers.items %}
-    {#server_info#}
-    {%include "server_info.html" with value=value show_filter=1 show_status=1 show_del=1 show_graph=1 %}
-{% endfor %}
-
-{%endblock%}
-
-{%block autorefresh%}
-{%if auto_refresh and auto_refresh != -1%}
-$(document).ready(function(){
-test({{auto_refresh}});
-});
-{%endif%}
-{%endblock%}
+{% block autorefresh %}
+    {% if auto_refresh and auto_refresh != -1 %}
+        $(document).ready(function(){
+        test({{ auto_refresh }});
+        });
+    {% endif %}
+{% endblock %}
