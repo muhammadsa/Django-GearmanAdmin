@@ -151,7 +151,6 @@ def fill_server_stats(server_id, history_length, force_fill=False):
             health = False
             pass
 
-
         try:
             #saving in history
             history = ServerHistory(server=server_obj, healthy=health,
@@ -289,7 +288,7 @@ def shutdown(request, server_id, grace=None):
 
     try:
         socket.setdefaulttimeout(2)
-        #conn.send_shutdown(graceful=grace)
+        conn.send_shutdown(graceful=grace)
     except:
         raise Exception("can not execute command on gearmand server")
 
