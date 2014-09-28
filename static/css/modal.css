@@ -1,0 +1,177 @@
+/*Modal Styles: confirm*/
+#confirm {
+    display: none;
+}
+
+/* Overlay */
+#confirm-overlay {
+    background-color: #ccc;
+    cursor: wait;
+}
+
+/* Container */
+#confirm-container {
+    height: 120px;
+    width: 420px;
+    font: 16px/22px 'Trebuchet MS', Verdana, Arial;
+    text-align: left;
+    background: #fff;
+    border: 5px solid rgba(132, 132, 132, .7);
+    -webkit-background-clip: padding-box; /* for Safari */
+    background-clip: padding-box; /* for IE9+, Firefox 4+, Opera, Chrome */
+}
+
+#confirm-container .header {
+    height: 30px;
+    line-height: 30px;
+    width: 100%; /*background: url(./images/header.gif) repeat-x;*/
+    background-color: #6D84B4;
+    border-top: solid 1px #3B5998;
+    color: #fff;
+    font-weight: bold;
+}
+
+#confirm-container .header span {
+    padding-left: 8px;
+}
+
+#confirm-container .message {
+    color: #333;
+    font-size: 14px;
+    margin: 0;
+    padding: 12px 4px 12px 8px;
+}
+
+#confirm-container .buttons {
+    line-height: 18px;
+    width: 160px;
+    float: right;
+    padding: 5px 5px 0;
+}
+
+#confirm-container .buttons div {
+    float: right;
+    margin-left: 4px;
+    width: 50px;
+    height: 18px;
+    color: #666;
+    font-weight: bold;
+    text-align: center;
+    background: url(../img/confirm/button.gif) repeat-x;
+    border: 1px solid #bbb;
+    cursor: pointer;
+}
+
+#confirm-container a.modal-close, #confirm-container a.modal-close:link, #confirm-container a.modal-close:active, #confirm-container a.modal-close:visited {
+    text-decoration: none;
+    font-weight: bold;
+    position: absolute;
+    right: 10px;
+    top: 2px;
+    color: #fff;
+}
+
+#confirm-container a.modal-close:hover {
+    color: #ccc;
+}
+
+/*Modal Styles: standard*/
+#basic-modal-content {
+    display: none;
+}
+
+/* Overlay */
+#simplemodal-overlay {
+    background-color: #000;
+    cursor: wait;
+}
+
+/* Container */
+#simplemodal-container {
+    height: 350px;
+    width: 600px;
+    color: #bbb;
+    background-color: #333;
+    border: 10px solid rgba(60, 63, 65, 0.30);
+    -webkit-background-clip: padding-box; /* for Safari */
+    background-clip: padding-box; /* for IE9+, Firefox 4+, Opera, Chrome */
+    padding: 12px;
+}
+
+/*content: data itself inside the form*/
+#simplemodal-container .simplemodal-data {
+    padding: 8px;
+}
+
+#simplemodal-container a {
+    color: #ddd;
+}
+
+/*#simplemodal-container a.modalCloseImg {*/
+/*background: url(../images/x.png) no-repeat;*/
+/*width: 25px;*/
+/*height: 29px;*/
+/*display: inline;*/
+/*z-index: 3200;*/
+/*position: absolute;*/
+/*top: -15px;*/
+/*right: -16px;*/
+/*cursor: pointer;*/
+/*}*/
+
+#simplemodal-container h3 {
+    color: #84b8d9;
+}
+
+#simplemodal-container a.modal-close, #simplemodal-container a.modal-close:link, #simplemodal-container a.modal-close:active, #simplemodal-container a.modal-close:visited {
+    text-decoration: none;
+    font-weight: bold;
+    position: absolute;
+    right: 10px;
+    top: 2px;
+    color: #fff;
+}
+
+#simplemodal-container a.modal-close:hover {
+    color: #ccc;
+}
+
+.modal-close {
+    font-size: 20px;
+    font-weight: bold;
+    line-height: 18px;
+    position: absolute;
+    right: 10px;
+    top: 2px;
+    color: #000000;
+    text-shadow: 0 1px 0 #ffffff;
+    opacity: 0.2;
+    filter: alpha(opacity=20);
+    text-decoration: none;
+}
+
+.modal-close:hover {
+    color: #000000;
+    text-decoration: none;
+    opacity: 0.4;
+    filter: alpha(opacity=40);
+    cursor: pointer;
+}
+
+/*simplemodal-container1*/
+#simplemodal-overlay1 {
+    background-color: #fff;
+    cursor: wait;
+}
+
+/* Container */
+#simplemodal-container1 {
+    /*height: auto !important;*/
+    width: 600px;
+    color: #000;
+    background-color: #fff;
+    border: 10px solid rgba(60, 63, 65, 0.30);
+    -webkit-background-clip: padding-box; /* for Safari */
+    background-clip: padding-box; /* for IE9+, Firefox 4+, Opera, Chrome */
+    padding: 12px;
+}
