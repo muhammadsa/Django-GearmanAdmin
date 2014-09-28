@@ -1,0 +1,42 @@
+<div id='confirm'>
+    <div class='header'>
+        <span>Confirm</span></div>
+    <div class='message'>
+    </div>
+    <div class='buttons'>
+        <div class='no simplemodal-close'>
+            No
+        </div>
+        <div class='yes'>
+            Yes
+        </div>
+    </div>
+</div>
+
+
+<script>
+    function confirm(message, callback) {
+        $('#confirm').modal({
+            closeHTML: "<div style='position: absolute; right: 6px; top: 6px'><a class='close'>×</a></div>",
+            position: ["20%" ],
+            overlayId: 'confirm-overlay',
+            containerId: 'confirm-container',
+            onShow: function (dialog) {
+                var modal = this;
+
+                $('.message', dialog.data[0]).append(message);
+
+                // if the user clicks "yes"
+                $('.yes', dialog.data[0]).click(function () {
+                    // call the callback
+                    if ($.isFunction(callback)) {
+                        callback.apply();
+                    }
+                    // close the dialog
+                    modal.close(); // or $.modal.close();
+                });
+            }
+        });
+
+    }
+</script>

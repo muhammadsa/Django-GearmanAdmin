@@ -1,0 +1,62 @@
+<script>
+    //it might be class or id
+    var element_id = '{{ element_id }}';
+
+    $(element_id).click(function (e) {
+        e.preventDefault();
+
+        {% if form_url %}
+            $.get("{{ form_url }}", function (data) {
+                // create a modal dialog with the data
+                console.log('got the form data ' + '{{ form_url }}');
+
+                $.modal(data, {
+                    closeHTML: "<a href='#' title='Close' class='modal-close'>x</a>",
+                    escClose: true,
+                    height: "{{ height }}",
+                    overlayId: {% if overLay %}'{{ overLay }}'{% else %}'simplemodal-overlay'{% endif %},
+                    containerId: {% if container %}'{{ container }}'{% else %}'simplemodal-container'{% endif %}
+                    {% if onClose %},
+                        onClose: {{ onClose }}
+                    {% endif %}
+                    {% if onOpen %},
+                        onOpen: {{ onOpen}}
+                    {% endif %}
+                    {% if onShow %},
+                        onShow: {{ onShow }}
+                    {% endif %}
+                });
+            });
+        {% else %}
+            var form_url = $(this).attr('form_url');
+            $.get(form_url, function (data) {
+                // create a modal dialog with the data
+                console.log('got the form data ' + '{{ form_url }}');
+                $.modal(data, {
+                    closeHTML: "<a href='#' title='Close' class='modal-close'>x</a>",
+                    escClose: true,
+
+                    overlayId: {% if overLay %}'{{ overLay }}'{% else %}'simplemodal-overlay'{% endif %},
+                    containerId: {% if container %}'{{ container }}'{% else %}'simplemodal-container'{% endif %}
+                    {% if onClose %},
+                        onClose: {{ onClose }}
+                    {% endif %}
+                    {% if onOpen %},
+                        onOpen: {{ onOpen}}
+                    {% endif %}
+                    {% if onShow %},
+                        onShow: {{ onShow }}
+                    {% endif %}
+                });
+            });
+
+        {% endif %}
+
+        {#        {% if container %}#}
+        {#            $('#' + '{{ container }}').css('height', 'auto');#}
+        {#        {% else %}#}
+        {#            $('#simplemodal-container').css('height', 'auto');#}
+        {#        {% endif %}#}
+    });
+
+</script>
