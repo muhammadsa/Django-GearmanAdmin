@@ -1,27 +1,26 @@
-{%extends "base.html"%}
+{% extends "base.html" %}
+{% block content %}
+    <script type="text/javascript" src="{{ STATIC_URL }}js/jscharts.js"></script>
+    <div class="row">
+        {% for key,value in target_servers.items %}
+            {% include "chart.html" with value=value length=length counter=forloop.counter type='summary' %}
+        {% endfor %}
+    </div>
+    <script>
+        $(document).ready(function () {
+            {% for key,value in target_servers.items %}
+                var myData{{value.server.id}} = new Array({{value.history | safe}});
+                var down_times{{value.server.id}} = new Array({{value.down_times | safe}});
+                drawServerChart("{{ value.server.id }}", myData{{value.server.id}}, down_times{{value.server.id}}, "chartcontainer" + "{{ value.server.id }}");
+            {% endfor %}
 
-{%block content%}
- <div class="row">
-
-
-
-{%for key,value in target_servers.items %}
-{#      <div class="col-6 col-sm-4 col-lg-4">#}
-{#              <h2>{{ key }}</h2>#}
-{#              <p>Donec id elit non mi porta gravida at eget metus. </p>#}
-{#              <p><a class="btn btn-default" href="#" role="button">View details &raquo;</a></p>#}
-              {%include "chart.html" with value=value length=length counter=forloop.counter filters=filter_basis_options%}
-{#    </div>#}
-{%endfor%}
-      </div><!--/span-->
-{%endblock%}
-
-
-
-{%block autorefresh%}
-{%if auto_refresh and auto_refresh != -1%}
-$(document).ready(function(){
-test({{auto_refresh}});
-});
-{%endif%}
-{%endblock%}
+        });
+    </script>
+{% endblock %}
+{% block autorefresh %}
+    {% if auto_refresh and auto_refresh != -1 %}
+        $(document).ready(function(){
+        test({{ auto_refresh }});
+        });
+    {% endif %}
+{% endblock %}

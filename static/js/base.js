@@ -1,6 +1,41 @@
 /**
  * Created by Muhammads on 9/28/2014.
  */
+var last_time = 0;
+
+function timedRefresh(timeoutPeriod) {
+    if (last_time != 0) {
+        clearTimeout(last_time);
+    }
+
+    last_time = setTimeout("location.reload(false);", timeoutPeriod);
+}
+
+var test = function ($end) {
+    if ($end == null || $end == -1){
+
+        if(last_time>0)
+            clearTimeout(last_time);
+
+        $('#beforefoo').css('display', 'none');
+        $(document).onload = null;
+        $('#foo').counter({start:0,end:0,time:0, step:0});
+    }
+    else {
+        $('#beforefoo').css('display', 'inline');
+        $(document).onload = timedRefresh($end * 1000);
+        $('#foo').counter({
+            start: 1,
+            end: $end,
+            time: $end - 1,
+            step: 1000,
+            callback: function () {
+                //alert("I'm done!");
+            }
+        });
+    }
+};
+
 function show(dialog) {
     return true;
 }
@@ -10,13 +45,13 @@ function open(dialog) {
     if ($.browser) {
 
         if ($.browser.mozilla) {
-            $('#simplemodal-container .button').css({
+            $('div#simplemodal-container .button').css({
                 'padding-bottom': '2px'
             });
         }
         // input field font size
         if ($.browser.safari) {
-            $('#simplemodal-container .input').css({
+            $('div#simplemodal-container .input').css({
                 'font-size': '.9em'
             });
         }
@@ -24,19 +59,19 @@ function open(dialog) {
     // dynamically determine height
     var h = 280;
 
-    var title = $('#simplemodal-container .title').html();
-    $('#simplemodal-container .title').html('Loading...');
+    var $title = $('div#simplemodal-container .title');
+    var tempTitle = $title.html();
+
+    $title.html('Loading...');
     dialog.overlay.fadeIn(200, function () {
         dialog.container.fadeIn(200, function () {
             dialog.data.fadeIn(200, function () {
-                $('#simplemodal-container .content').animate({
+                $('div#simplemodal-container .content').animate({
                     height: h
                 }, function () {
-                    $('#simplemodal-container .title').html(title);
-                    $('#simplemodal-container form').fadeIn(200, function () {
-                        $('#simplemodal-container #simplemodal-name').focus();
-
-
+                    $title.html(tempTitle);
+                    $('div#simplemodal-container form').fadeIn(200, function () {
+                        $('div#simplemodal-container div#simplemodal-name').focus();
                     });
                 });
             });
@@ -44,14 +79,11 @@ function open(dialog) {
     });
 }
 
-
 function close(dialog) {
     try {
-        $('#simplemodal-container .message').fadeOut();
-        //$('#simplemodal-container').html('Goodbye...');
-        $('#simplemodal-container form').fadeOut(200);
-
-        $('#simplemodal-container').animate({
+        $('div#simplemodal-container .message').fadeOut();
+        $('div#simplemodal-container form').fadeOut(200);
+        $('div#simplemodal-container').animate({
             height: 40
         }, function () {
             dialog.data.fadeOut(200, function () {
@@ -64,11 +96,8 @@ function close(dialog) {
             });
         });
     } catch (ex) {
-
         alert(ex);
     }
-
-
 }
 
 $("#add_server").click(function (e) {
@@ -84,15 +113,13 @@ $("#add_server").click(function (e) {
             overlayId: 'simplemodal-overlay',
             containerId: 'simplemodal-container',
             onClose: close
-
-
         });
     });
 });
 
 function auto_refresh(val) {
     xAjax.postWithLoadTarget("/refresh_script/" + val, null,
-        $(".divtest"), function (data) {
+       null, function (data) {
             if (data.err) {
                 console.log("error while refresh" + data.err + data.err_desc);
             }
@@ -100,16 +127,16 @@ function auto_refresh(val) {
                 test(val);
             }
         });
-
 }
 
-$("#diable_auto_refresh").click(function (e) {
+$("a#diable_auto_refresh").click(function (e) {
     e.preventDefault();
+    console.log('test');
     auto_refresh(-1);
 });
 
-$(".refresh").each(function (i, v) {
 
+$("a.refresh").each(function (i, v) {
     var $id = $.attr(v, 'id');
     var $rate = $.attr(v, 'rate');
 

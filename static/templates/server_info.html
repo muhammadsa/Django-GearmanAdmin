@@ -1,5 +1,6 @@
 {% load my_tags %}
-<div id="server{{ value.server.id }}" style="border-bottom: 1px solid #ddd; padding-top: 15px;">
+
+<div id="server{{ value.server.id|slugify }}" style="border-bottom: 1px solid #ddd; padding-top: 15px;">
     <table class="table table-bordered table-striped">
         <tr>
             <th colspan="2">
@@ -8,42 +9,18 @@
                     {% if show_status %}
                         <a class="details" href="#"
                            form_url={% url "status" value.server.id %} alt='get_status'>details</a>
-
-                        {#                        {{ '/status/'|add_ex:value.server.id }}#}
-                        {#                        {% with server_id=value.server.id|slugify %}#}
-                        {#                            {% include "sub/modal.html" with height=600 element_id="details" form_url=''|add:"/status/"|add:server_id %}#}
-                        {#                        {% endwith %}#}
                     {% endif %}
 
                     {% if value.response_time != '' %}
                         <a class="shutdown" href="#" action={% url "sdown" server_id=value.server.id %} alt='shutdown'>shutdown</a>
-
                         <a class="shutdown" href="#" action={% url "sdown" grace="grace/" server_id=value.server.id %}>shutdown
                             (gracefully)</a>
-
                         <a class="workers" href="#" form_url={% url "workers" value.server.id %} alt='get_workers'>workers</a>
                     {% endif %}
 
                     {% if show_del %}
-                        {#        old url {#    {% url "del_server" value.server.id %}#}
-                        <a id="delete_server{{ value.server.id }}" href="{{ value.server.id }}" alt='del'>delete</a>
-                        <script>
-                            $("#delete_server" + "{{ value.server.id }}").click(function (e) {
-                                e.preventDefault();
-                                confirm("Are you sure you want to delete this server and its contents?", function () {
-                                    //POST asking for deletion
-
-                                    xAjax.postWithLoadTarget("/del/" + "{{ value.server.id }}", null,
-                                            $(".divtest"), function (data) {
-                                                //console.log("#server" +  "{{ value.server.id }}");
-                                                $("#server" + "{{ value.server.id }}").remove();
-                                            });
-                                });
-                            });
-
-                        </script>
-
-
+                        <a class="delete_server" href="#" target_id="#server{{ value.server.id|slugify }}"
+                           action_url="{% url "del_server" value.server.id %}" alt='del'>delete</a>
                     {% endif %}
 
                 </div>
@@ -67,51 +44,49 @@
     {#status: {{value.status_response}} <br />#}
     {#value.down_times#}
     {#workers info#}
-
     {% if status_info %}
         {% include "status_info.html" with value=value status_info=status_info %}
     {% endif %}
-
     {% if show_graph %}
-        <script type="text/javascript" src="{{ STATIC_URL }}js/jscharts.js"></script>
-
-        {% if show_filter %}
-            <div class="btn-toolbar" role="toolbar">
-                <div class="btn-group">
-                    <button type="button" class="btn btn-default"><span class="">Currently</span></button>
-                    <button type="button" class="btn btn-default"><span class="">Hourly</span></button>
-                    <button type="button" class="btn btn-default"><span class="">Daily</span></button>
-                    <button type="button" class="btn btn-default"><span class="">Weekly</span></button>
-                    <button type="button" class="btn btn-default"><span class="">Monthly</span></button>
-
-                </div>
-            </div>
-        {% endif %}
-
-        <div id="chartcontainer{{ value.server.id }}">Loading ...</div>
-        <script type="text/javascript">
-            var myData = new Array({{value.history|safe}});
-            var myChart = new JSChart('chartcontainer{{value.server.id}}', 'line');
-            myChart.setDataArray(myData);
-            myChart.setAxisNameX('');
-            myChart.setAxisNameY('');
-            myChart.setAxisValuesAngle(45);
-            myChart.setAxisPaddingBottom(50);
-            var width = $("#server" + "{{ value.server.id }}").width();
-
-            myChart.setSize(width + 25, 350)
-            myChart.setTitle('Response times of gearman job server in {{value.server.host}}:{{value.server.port_no}} for today');
-            {%if value.down_times  %}
-                var down_times{{value.server.id}} = new Array({{value.down_times | safe}});
-                //console.log(down_times);
-                for (var i = 0; i < down_times{{value.server.id}}.length; i++) {
-                    myChart.setTooltip(down_times{{value.server.id}}[i]);
-                }
-            {%endif%}
-
-            myChart.draw();
-        </script>
+        {% include "chart.html" with value=value counter=forloop.counter type='servers' %}
     {% endif %}
-
-
 </div>
+
+
+{##}
+{#   {% if show_filter %}#}
+{#            <div class="btn-toolbar" role="toolbar">#}
+{#                <div class="btn-group">#}
+{#                    <button type="button" class="btn btn-default"><span class="">Currently</span></button>#}
+{#                    <button type="button" class="btn btn-default"><span class="">Hourly</span></button>#}
+{#                    <button type="button" class="btn btn-default"><span class="">Daily</span></button>#}
+{#                    <button type="button" class="btn btn-default"><span class="">Weekly</span></button>#}
+{#                    <button type="button" class="btn btn-default"><span class="">Monthly</span></button>#}
+{##}
+{#                </div>#}
+{#            </div>#}
+{#        {% endif %}#}
+{##}
+{#        <div id="chartcontainer{{ value.server.id }}">Loading ...</div>#}
+{#        <script type="text/javascript">#}
+{#            var myData = new Array({{value.history|safe}});#}
+{#            var myChart = new JSChart('chartcontainer{{value.server.id}}', 'line');#}
+{#            myChart.setDataArray(myData);#}
+{#            myChart.setAxisNameX('');#}
+{#            myChart.setAxisNameY('');#}
+{#            myChart.setAxisValuesAngle(45);#}
+{#            myChart.setAxisPaddingBottom(50);#}
+{#            var width = $("#server" + "{{ value.server.id }}").width();#}
+{##}
+{#            myChart.setSize(width + 25, 350)#}
+{#            myChart.setTitle('Response times of gearman job server in {{value.server.host}}:{{value.server.port_no}} for today');#}
+{#            {%if value.down_times  %}#}
+{#                var down_times{{value.server.id}} = new Array({{value.down_times | safe}});#}
+{#                //console.log(down_times);#}
+{#                for (var i = 0; i < down_times{{value.server.id}}.length; i++) {#}
+{#                    myChart.setTooltip(down_times{{value.server.id}}[i]);#}
+{#                }#}
+{#            {%endif%}#}
+{##}
+{#            myChart.draw();#}
+{#        </script>#}

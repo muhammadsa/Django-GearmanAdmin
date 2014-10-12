@@ -1,10 +1,12 @@
 ﻿.t {
 
     float: left;
-    margin-left: 20px;
-    margin-top: 20px;
-    border: solid 1px;
-    width: 450px
+    margin: 20px;
+
+    border: solid 1px lightgray;
+    width: auto;
+    display: block;
+
 }
 
 .row {
@@ -45,4 +47,35 @@
     padding-right: 10px;
     padding-left: 10px;
     padding-bottom: 10px;
+}
+
+.loading {
+    position: absolute;
+    width: 35px;
+    height: 35px;
+    background-image: url('/static/images/loading.gif');
+    background-repeat: no-repeat;
+    z-index: 5000;
+    left: 491px;
+    top: 423px;
+}
+
+.refresh_block {
+    display: inline-block;
+    right: 0px;
+    top: 0px;
+    float: right;
+    margin-right: 20px;
+    margin-top: 2px
+}
+
+
+
+.input-group {
+    max-width: 200px;
+    display: inline-table;
+}
+
+.btn-group {
+    display: block;
 }

@@ -1,18 +1,27 @@
 {% extends "base.html" %}
 {% block content %}
-{#    <style>#}
-{#        #chartcontainer div {#}
-{#            display: none;#}
-{#        }#}
-{#    </style>#}
     {% include "sub/confirm.html" %}
+    {% with showgraph=1 %}
+        {% if showgraph == 1 %}
+            <script type="text/javascript" src="{{ STATIC_URL }}js/jscharts.js"></script>
+        {% endif %}
+        {% for key,value in target_servers.items %}
+            {% include "server_info.html" with value=value show_filter=1 show_status=1 show_del=1 show_graph=showgraph filter_basis_options=filter %}
+        {% endfor %}
+        {% if showgraph %}
+            <script>
+                $(document).ready(function () {
+                    {% for key,value in target_servers.items %}
+                        var $forServer = "{{ value.server.id }}";
+                        var myData{{value.server.id}} = new Array({{value.history | safe}});
+                        var down_times{{value.server.id}} = new Array({{value.down_times | safe}});
+                        drawServerChart($forServer, myData{{value.server.id}}, down_times{{value.server.id}}, "chartcontainer" + $forServer, "", 'servers');
+                    {% endfor %}
 
-    {% for key,value in target_servers.items %}
-        {#server_info#}
-        {% include "server_info.html" with value=value show_filter=1 show_status=1 show_del=1 show_graph=1 %}
-    {% endfor %}
-
-
+                });
+            </script>
+        {% endif %}
+    {% endwith %}
 {% endblock %}
 
 {% block autorefresh %}
@@ -22,3 +31,9 @@
         });
     {% endif %}
 {% endblock %}
+
+{#    <style>#}
+{#        #chartcontainer div {#}
+{#            display: none;#}
+{#        }#}
+{#    </style>#}

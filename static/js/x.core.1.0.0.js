@@ -1,4 +1,5 @@
-﻿var isDebugMode = true;
+﻿//Author: Muhammad Suliman
+var isDebugMode = true;
 
 //<script type="text/javascript">
 //xCore.loadScript("http://your.cdn.com/second.js", function(){
@@ -6,6 +7,16 @@
 //});
 //</script>
 
+//formatting string according to whatever you are typing inside string "".format("{0}...{1}", var1,var2);
+String.prototype.format = String.prototype.f = function () {
+    var s = this,
+        i = arguments.length;
+
+    while (i--) {
+        s = s.replace(new RegExp('\\{' + i + '\\}', 'gm'), arguments[i]);
+    }
+    return s;
+};
 
 var xCore = {
     //load javascript without blocking (at runtime..and also whenever needed only.)
@@ -39,25 +50,9 @@ var xCore = {
         if (runnable && runnable.run)
             $(document).ready(runnable.run);
     },
-    getCookie: function (name) {
-        var cookieValue = null;
-        if (document.cookie && document.cookie != '') {
-            var cookies = document.cookie.split(';');
-            for (var i = 0; i < cookies.length; i++) {
-                var cookie = jQuery.trim(cookies[i]);
-                // Does this cookie string begin with the name we want?
-                if (cookie.substring(0, name.length + 1) == (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
-            }
-        }
-        return cookieValue;
-    },
     setDebugMode: function () {
         isDebugMode = true;
     },
-
     stringManipulation: {
         trim: function (str) {
             if (isDebugMode) {
@@ -69,8 +64,6 @@ var xCore = {
             return str.slice(start, end + 1);
         }
     },
-
-
     errorHandler: {
         listmethods: function getMethods(obj) {
             if (obj == null || obj == 'undefined')
@@ -113,7 +106,21 @@ var xCore = {
             }
         }
     },
-
+    getCookie: function (name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie != '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = jQuery.trim(cookies[i]);
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    },
     isNull: function (obj) {
         if (obj == null || obj == 'undefined')
             return true;
@@ -122,26 +129,24 @@ var xCore = {
 
 
     },
-
-    redirect: function (url) {
-        try {
-            document.location.href = url;
-
-        }
-        catch (ex) {
+    http: {
+        redirect: function (url) {
             try {
-                window.location.href = url;
-            } catch (exx) {
+                document.location.href = url;
             }
-        }
+            catch (ex) {
+                try {
+                    window.location.href = url;
+                } catch (exx) {
+                }
+            }
 
-        return false;
+            return false;
+        }
     }
 };
 
-
 var xPosition = {
-
     centeralize: function (source, destination) {
         if (isDebugMode) {
             console.log('centralize: start');
@@ -150,40 +155,34 @@ var xPosition = {
         if (destination == null || destination == 'undefined')
             destination = $("<div class='loading'></div>");
 
-
         if (source == null || source == 'undefined')
             source = $(window);
 
-        offset = source.offset();
+        var offset = source.offset();
         //  alert(offset.left + "/" + offset.top + "-" + (offset.left + source.width()));
+        var isOffsetNull = xCore.isNull(offset);
+        var sourceTopLeftX = isOffsetNull ? 0 : offset.left;
+        var sourceTopLeftY = isOffsetNull ? 0 : offset.top;
+        //var sourceTopRightX = isOffsetNull ? source.width() : offset.left + source.width();
+        //var sourceBottomLeftY = isOffsetNull ? source.height() : offset.top + source.height();
 
-        isOffsetNull = xCore.isNull(offset);
-        sourceTopLeftX = isOffsetNull ? 0 : offset.left;
-        sourceTopLeftY = isOffsetNull ? 0 : offset.top;
-        sourceTopRightX = isOffsetNull ? source.width() : offset.left + source.width();
-        sourceBottomLeftY = isOffsetNull ? source.height() : offset.top + source.height();
-
-        midX = sourceTopLeftX + ((sourceTopRightX - sourceTopLeftX) / 2);
-        midY = sourceTopLeftY + ((sourceBottomLeftY - sourceTopLeftY) / 2);
+        //var midX = sourceTopLeftX + ((sourceTopRightX - sourceTopLeftX) / 2);
+        //var midY = sourceTopLeftY + ((sourceBottomLeftY - sourceTopLeftY) / 2);
+        var midX = sourceTopLeftX + (source.width() / 2);
+        var midY = sourceTopLeftY + (source.height() / 2);
 
         //TO DO: how to get the size [width/height] according to image
-        x = midX - (35 / 2) + "px";
-        y = midY - (35 / 2) + "px";
-
-
+        var x = midX - (35 / 2) + "px", y = midY - (35 / 2) + "px";
         destination.css({ left: x, top: y });
 
-
-        if (isOffsetNull)
-            destination.appendTo(document.body);
-        else
-            source.append(destination);
+        //if (isOffsetNull)
+        destination.appendTo(document.body);
+        //else
+        //    source.append(destination);
 
         if (destination.css('display') == 'none')
             destination.css('display', 'inline');
-
     },
-
     remove: function (source, destination) {
         if (isDebugMode) {
             console.log('remove: start');
@@ -195,7 +194,6 @@ var xPosition = {
         //TO DO: validate and make sure that source has this destination...
         destination.remove();
     }
-
 };
 
 function csrfSafeMethod(method) {
@@ -215,19 +213,75 @@ $.ajaxSetup({
 
 var xAjax = {
 
-    finalizeErrorProcess: function (response, onError, onComplete) {
+    preajax: function (loadingImage, centralizeLoaderImage, loadTarget, onSuccess, onError, onComplete) {
         if (isDebugMode) {
-            console.log('finalizeErrorProcess: start');
+            console.log('post2: start');
         }
-    },
+        try {
+            var isLoadingImageNull = false;
 
-    getWithLoadTargetId: function (requestUrl, data, loadTargetId, onSuccess, onComplete) {
-        if (isDebugMode) {
-            console.log('getWithLoadTargetId: start');
+            if (!loadingImage || loadingImage == null || loadingImage == 'undefined') {
+                var loadingClass = "<div class='loading" +
+                    (loadTarget ? " for_" + loadTarget.attr('class') + "'" : "'") +
+                    "></div>";
+                loadingImage = $(loadingClass);
+                isLoadingImageNull = true;
+            }
+
+            //wrap the control with div then calculate the mid of the new div then add the loading image there
+            if (centralizeLoaderImage == true)
+                try {
+                    xPosition.centeralize(loadTarget, loadingImage);
+                }
+                catch (ex) {
+                }
+            else
+                loadingImage.css('display', 'inline');
+
+            var completeFunction = function () {
+                if (onComplete) {
+                    if (isDebugMode) {
+                        console.log('calling your complete function')
+                    }
+                    onComplete();
+                }
+                if (isLoadingImageNull) {
+                    if (isDebugMode) {
+                        console.log('removing using xposition.remove')
+                    }
+                    //TODO: to get rid of "remove" as it make an error named "has no method 'replace'"
+                    try {
+                        if (loadTarget && loadTarget != 'undefined') {
+                            console.log('removing class:' + "div.loading.for_" + loadTarget.attr("class").replace(' ', '.'));
+                            xPosition.remove(loadTarget, $("div.loading.for_" + loadTarget.attr("class").replace(' ', '.')));
+                        }
+                        else
+                            xPosition.remove($(document), $(".loading"));
+                    } catch (ex) {
+                    }
+                }
+                else {
+                    if (isDebugMode) {
+                        console.log('inline removing using display attribute in css')
+                    }
+                    loadingImage.css('display', 'none');
+                }
+
+
+            };
+
+            if (isDebugMode) {
+                console.log('preajax finished .. ajax: start');
+            }
+
+            return completeFunction;
         }
-
-        xAjax.getWithLoadTarget(requestUrl, data, $("#", loadTargetId), onSuccess, onComplete);
-
+        catch (ex) {
+            if (isDebugMode) {
+                console.log('exception inside preajax: ' + ex + 'complete function will be execluded');
+            }
+            return null;
+        }
     },
     getWithLoadTarget: function (requestUrl, data, loadTarget, onSuccess, onComplete) {
         if (isDebugMode) {
@@ -249,7 +303,6 @@ var xAjax = {
             }
             if (loadTarget) {
                 xPosition.remove(loadTarget, loadTarget.find(".loading"));
-
             }
         };
         if (isDebugMode) {
@@ -263,23 +316,79 @@ var xAjax = {
             contentType: "application/json; charset=utf-8",
             dataType: "json",
             success: function (response) {
-                onSuccess(response);
-                completeFunction();
+                try {
+                    onSuccess(response);
+                } catch (ex) {
+                    xCore.errorHandler.showError('exception while executing success method : ' + ex)
+                }
+                try {
+                    completeFunction();
+                } catch (ex) {
+                    xCore.errorHandler.showError('exception while executing complete method : ' + ex)
+                }
             },
             error: function (response) {
+                console.log("Ajax Request Failed");
+                xCore.errorHandler.showError('response is: ' + response);
                 try {
-                    console.log("Ajax Request Failed");
-                    xCore.errorHandler.showError('response is: ' + response);
                     completeFunction();
-                }
-                catch (ex) {
-                    if (isDebugMode) console.log(ex);
+                } catch (ex) {
+                    xCore.errorHandler.showError('exception while executing complete method : ' + ex)
                 }
             }
         });
 
     },
+    getWithLoadTarget2: function (requestUrl, data, loadTarget, onSuccess, onComplete) {
+        if (isDebugMode) {
+            console.log('getWithLoadTarget: start');
+        }
+        xAjax.get2(requestUrl, data, null, true, loadTarget, onSuccess, null, onComplete);
+    },
+    get2: function (requestUrl, data, loadingImage, centralizeLoaderImage, loadTarget, onSuccess, onError, onComplete) {
+        try {
+            var completeFunction = xAjax.preajax(loadingImage, centralizeLoaderImage, loadTarget, onSuccess, onError, onComplete);
 
+            $.ajax({
+                type: "GET",
+                url: requestUrl,
+                data: data,
+                context: this,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (data, status) {
+                    onSuccess(data, status);
+                    console.log('calling custom complete function');
+                    try {
+                        completeFunction();
+                    } catch (ex) {
+                        console.log(ex);
+                    }
+                },
+                error: function (response, ajaxOptions, thrownError) {
+                    try {
+                        if (onError)
+                            onError(response);
+                        else {
+                            if (isDebugMode) {
+                                console.log("Ajax Request Failed" + thrownError);
+                                xCore.errorHandler.showError('response is: ' + response);
+                            }
+                        }
+                        console.log('calling custom complete function');
+                        xCore.invoke(completeFunction);
+                    }
+                    catch (ex) {
+                        if (isDebugMode) console.log(ex);
+                    }
+                }
+            });
+        }
+        catch (ex) {
+            if (isDebugMode)
+                console.log(ex);
+        }
+    },
     get: function (requestUrl, data, loaderImageId, onSuccess, onComplete) {
         if (isDebugMode) {
             console.log('get: start');
@@ -333,65 +442,6 @@ var xAjax = {
             }
         });
     },
-    get33: function (requestUrl, data, contentType, loaderImageId, onSuccess, onComplete) {
-
-        if (loaderImageId) {
-            $("#" + loaderImageId).css('display', 'inline');
-
-        }
-
-        var completeFunction = function () {
-            if (onComplete && typeof onComplete == 'function') {
-                onComplete();
-            }
-            if (loaderImageId) {
-                $("#" + loaderImageId).css('display', 'none');
-            }
-        };
-
-
-        $.ajax({
-            type: "GET",
-            url: requestUrl,
-            contentType: contentType,
-            data: data,
-            context: this,
-
-
-            success: function (response) {
-
-                onSuccess(response);
-                completeFunction();
-            },
-            error: function (response) {
-                try {
-                    if (isDebugMode) {
-                        console.log("Ajax Request Failed, response: " + response.responseText);
-                        xCore.errorHandler.showError('response is: ' + response);
-                    }
-                    completeFunction();
-                }
-                catch (ex) {
-                    if (isDebugMode)
-                        console.log(ex);
-                }
-            }
-        });
-    },
-    postWithLoadTargetId: function (requestUrl, data, loadTargetId, onSuccess, onComplete) {
-
-        if (isDebugMode) {
-            console.log('postWithLoadTargetId : start');
-        }
-        s = $("#", loadTargetId);
-
-        if (s == null || s == 'undefined')
-            if (isDebugMode)
-                console.log('could not find the load target...');
-
-        xAjax.postWithLoadTarget(requestUrl, data, s, onSuccess, onComplete);
-    },
-
     postWithLoadTarget: function (requestUrl, data, loadTarget, onSuccess, onComplete) {
         if (isDebugMode) {
             console.log('postWithLoadTarget: start');
@@ -400,53 +450,12 @@ var xAjax = {
 
 
     },
-    // using jQuery
     post2: function (requestUrl, data, loadingImage, centralizeLoaderImage, loadTarget, onSuccess, onError, onComplete) {
         if (isDebugMode) {
             console.log('post2: start');
         }
         try {
-            isLoadingImageNull = false;
-
-            if (!loadingImage || loadingImage == null || loadingImage == 'undefined') {
-                loadingImage = $("<div class='loading'></div>");
-                isLoadingImageNull = true;
-            }
-
-
-            //wrap the control with div then calculate the mid of the new div then add the loading image there
-            if (centralizeLoaderImage == true)
-                try {
-                    xPosition.centeralize(loadTarget, loadingImage);
-                }
-                catch (ex) {
-                }
-            else
-                loadingImage.css('display', 'inline');
-
-            var completeFunction = function () {
-
-                if (onComplete) {
-                    onComplete();
-                }
-
-                if (loadTarget) {
-
-
-                    if (isLoadingImageNull)
-                    //to get rid of "remove" as it make an error named "has no method 'replace'"
-                        try {
-                            xPosition.remove(loadTarget, loadTarget.find(".loading"));
-                        } catch (ex) {
-                        }
-                    else
-                        loadingImage.css('display', 'none');
-                }
-            };
-
-            if (isDebugMode) {
-                console.log('calling ajax: start');
-            }
+            var completeFunction = xAjax.preajax(loadingImage, centralizeLoaderImage, loadTarget, onSuccess, onError, onComplete);
 
             $.ajax({
                 type: "POST",
@@ -468,13 +477,10 @@ var xAjax = {
                             onError(response);
                         else {
                             if (isDebugMode) {
-                                //response.status
-                                //response.responseText
                                 console.log("Ajax Request Failed" + thrownError);
                                 //xCore.errorHandler.showError('response is: ' + response);
                             }
                         }
-
                         completeFunction();
                     }
                     catch (ex) {
@@ -534,53 +540,6 @@ var xAjax = {
                 }
             }
         });
-    },
-    post33: function (requestUrl, data, contentType, loaderImageId, onSuccess, onComplete) {
-        if (isDebugMode) {
-            console.log('post33 : start');
-        }
-        if (loaderImageId) {
-            $("#" + loaderImageId).css('display', 'inline');
-        }
-
-        var completeFunction = function () {
-            if (onComplete) {
-                onComplete();
-            }
-            if (loaderImageId) {
-                $("#" + loaderImageId).css('display', 'none');
-            }
-        };
-        if (isDebugMode) {
-            console.log('calling ajax now: start');
-        }
-        $.ajax({
-            type: "POST",
-            contentType: contentType,
-            url: requestUrl,
-            context: this,
-            data: data,
-            success: function (response) {
-                if (isDebugMode) {
-                    console.log('success ajax');
-                }
-                onSuccess(response);
-                completeFunction();
-            },
-            error: function (response) {
-                try {
-                    if (isDebugMode) {
-                        console.log("Ajax Request Failed");
-                    }
-
-                    xCore.errorHandler.showError('response is: ' + response);
-                    completeFunction();
-                }
-                catch (ex) {
-                    if (isDebugMode) console.log(ex);
-                }
-            }
-        });
     }
 };
 
@@ -596,9 +555,11 @@ var xAjax = {
             step: 1000,
             callback: function () {
             }
-        }
+        };
+
         var options = $.extend(defaults, options);
 
+        console.log('counter?' + options.end);
         var counterFunc = function (el, increment, end, step) {
             var value = parseInt(el.html(), 10) + increment;
             if (value >= end) {
@@ -609,17 +570,21 @@ var xAjax = {
                 setTimeout(counterFunc, step, el, increment, end, step);
             }
         }
+        if (parseInt(last_counter_time) > 0) {
+            options.step = 0;
+        }
 
         $(this).html(Math.round(options.start));
+
         var increment = (options.end - options.start) / ((1000 / options.step) * options.time);
 
         (function (e, i, o, s) {
-            if(isDebugMode) console.log("last_counter_time " + last_counter_time);
-            if (parseInt(last_counter_time ) > 0) {
-                if(isDebugMode) console.log("clearing last counter time");
+            if (isDebugMode) console.log("last_counter_time " + last_counter_time);
+            if (parseInt(last_counter_time) > 0) {
+                if (isDebugMode) console.log("clearing last counter time");
                 clearTimeout(last_counter_time);
             }
-            last_counter_time  = setTimeout(counterFunc, s, e, i, o, s);
+            last_counter_time = setTimeout(counterFunc, s, e, i, o, s);
 
         })($(this), increment, options.end, options.step);
     }

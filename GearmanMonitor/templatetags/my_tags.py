@@ -2,6 +2,7 @@ __author__ = 'Muhammads'
 
 from django import template
 from datetime import date
+from ..models import RefreshRate
 
 register = template.Library()
 
@@ -20,10 +21,6 @@ def get_due_date_string(value):
     elif delta.days > 1:
         return "In %s days" % delta.days
 
-
-@register.filter(name='t')
-def t(value):
-    return "hello " + str(value)
 
 @register.filter(name='add_ex')
 def add_ex(value, arg):
@@ -65,3 +62,16 @@ def prefix(value, arg):
         return str(arg) + str(value)
     except:
         return value
+
+
+@register.filter(name='generate_refresh')
+def generate_refresh(value):
+    rates = RefreshRate.objects.all()
+    result = ""
+
+    for rate in rates:
+        rate_value = str(rate.rate_value)
+        result += "<li><a class=\"refresh\" rate=\"" + rate_value + \
+                  "\" id=\"refresh_" + rate_value + "\" href=\"" + "#" + "\">" + rate.name + "</a></li>"
+
+    return result

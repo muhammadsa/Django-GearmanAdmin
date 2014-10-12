@@ -1,93 +1,43 @@
-<div class="row" >
-<label for="year" class="control-label input-group">Filter</label>
-      <div class="btn-group" > {#data-toggle="buttons"#}
-
-        {%for k,v in filter%}
-            {% with s=id|add:"_"|add:k %}
-                    <label class="btn btn-default{%ifequal selected s %} active{%endifequal%}">
-                        <input type="radio" name="{{id}}" value="{{id}}_{{k}}" {%ifequal selected s %} checked="true"{%endifequal%}>{{v}}
-                    </label>
-            {%endwith%} 
-        {%endfor%}
-
-      </div>
-</div>
-
-<!--
+{% load my_tags %}
 <div class="row">
-    
-    <label for="year" class="control-label input-group">Year</label>
-    <div class="btn-group" data-toggle="buttons">
-        <label class="btn btn-default">
-            <input type="radio" name="year" value="2011">2011
-        </label>
-        <label class="btn btn-default">
-            <input type="radio" name="year" value="2012">2012
-        </label>
-        <label class="btn btn-default active">
-            <input type="radio" name="year" value="2013" checked="">2013
-        </label>
+    <label for="year" class="control-label input-group">Filter</label>
+
+    <div class="refresh_block">
+        <a class="fast_refresh" href="#" id="refresh_server" for="{{ id }}" data_length="{{ data_length }}" type="{{type|strip}}">Refresh</a>
+    </div>
+    <div class="btn-group"> {#data-toggle="buttons"#}
+        {% for k,v in filter %}
+            {% with s=id|add:"_"|add:k %}
+                <label class="btn btn-default{% ifequal selected s %} active{% endifequal %}">
+                    <input type="radio" data_length="{{ data_length }}" type="{{ type }}" name="{{ id }}" value="{{ id }}_{{ k }}" {% ifequal selected s %}
+                           checked="true"{% endifequal %}>{{ v }}
+                </label>
+            {% endwith %}
+        {% endfor %}
+
     </div>
 </div>
 
-        <button type="button" class="btn btn-default"><span class="">Recently</span></button>
-        <button type="button" class="btn btn-default"><span class="">Hourly</span></button>        
-        <button type="button" class="btn btn-default"><span class="">Daily</span></button>
-        <button type="button" class="btn btn-default"><span class="">Weekly</span></button>
-        <button type="button" class="btn btn-default"><span class="">Monthly</span></button>
--->
+{#data attributes#}
 
-<script>
+{#using html directly#}
+{#<div data-internalid="1337"></div>#}
 
-try{
-    $("#chartcontainer{{value.server.id}} div").remove();
-}
-catch(ex){
-    //alert(ex);
-}
+{#or using jquery#}
+{#To store something:#}
+{#$('#myElId').data('nameYourData', { foo: 'bar' });#}
+{#To retrieve data:#}
+{#var myData = $('#myElId').data('nameYourData');#}
 
-$('input:radio[name={{value.server.id}}]').click(function(){
-var $this = $(this);
-//$this.attr('checked', true);
-//alert($this.val());
-$this.parent().parent().find("label").removeClass("active");
-$this.parent().addClass("active");
-
-//call ajax to refresh the chart and to update database...
-
-var $server = $this.val().split('_')[0];
-//alert($server);
-
-
-$.ajax({
-  type: "GET",
-  url: "/schart",
-  //contentType: "application/json; charset=utf-8",
-  //dataType: "json",
-  data: { id : $server }
-    })
-    .done(function( msg ) {
-        //alert( "Data Saved: " + msg );
-        var obj = JSON.parse(msg);
-        //alert(obj.history);
-        try{
-            
-            var down_times = new Array(obj.down_times);   
-
-            var hist = eval("[" + obj.history.substring(1, obj.history.length-1) + "]");
-            //for(var i =0;i< r.length;i++){alert(r[i]);}
-            drawServerChart({{value.server.id}}, hist, down_times, "chartcontainer{{value.server.id}}", "today");
-            
-        }catch(ex){alert(ex);}
-        //obj.down_times
-        
-    })
-   .fail(function(ex){
-        alert('error' + ex);
-    })
-    .complete(function(){
-        //alert('complete');
-    });
-
-});
-</script>
+{##}
+{##}
+{#<script>#}
+{##}
+{#try{#}
+{#    $("#chartcontainer{{value.server.id}} div").remove();#}
+{#}#}
+{#catch(ex){#}
+{#    //alert(ex);#}
+{#}#}
+{##}
+{#</script>#}
