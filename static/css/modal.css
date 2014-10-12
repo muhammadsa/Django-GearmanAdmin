@@ -90,7 +90,7 @@
 #simplemodal-container {
     height: 350px;
     width: 600px;
-    color: #bbb;
+    color: #020202;
     background-color: #333;
     border: 10px solid rgba(60, 63, 65, 0.30);
     -webkit-background-clip: padding-box; /* for Safari */

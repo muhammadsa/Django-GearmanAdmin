@@ -2,3 +2,4 @@
 .pyproj
 .pyproj.user
 static/templates/tests
+.pyc
