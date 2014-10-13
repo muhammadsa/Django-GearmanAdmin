@@ -17,3 +17,8 @@ Prerequisites
 - gearman 2.0.2 [https://pypi.python.org/pypi/gearman/2.0.2]
   pip install gearman
 
+
+Donations, if you like it please support us and donate 
+http://spacegitengineering.blogspot.com/2014/10/new-gearman-admin-django-based-interface.html
+http://spacegitengineering.wordpress.com/2014/10/13/new-gearman-admin-django-based-interface/
+
