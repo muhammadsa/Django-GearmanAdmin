@@ -15,7 +15,7 @@ Prerequisites
 - Sqlite [http://www.sqlite.org/]
 - django-jsonresponse 0.10.0 [https://pypi.python.org/pypi/django-jsonresponse/0.10.0]
 - gearman 2.0.2 [https://pypi.python.org/pypi/gearman/2.0.2]
-  pip install gearman
+  * pip install gearman
 
 
 Donations
