@@ -17,6 +17,9 @@ Prerequisites
 - gearman 2.0.2 [https://pypi.python.org/pypi/gearman/2.0.2]
   * pip install gearman
 
+License
+-------
+Apache License, Version 2.0 
 
 Donations
 --------- 
