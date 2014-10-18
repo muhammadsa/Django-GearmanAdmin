@@ -20,10 +20,10 @@ urlpatterns = patterns('GearmanMonitor.views',
                        url(r'^summary/$', 'summary', {'template': 'summary.html'}, name='summary'),
                        url(r'^sfilter/(?P<filter_info>.*)$', 'sfilter', {'template': 'sfilter.html'}, name='sfilter'),
                        url(r'^about$', 'aboutme', {'template': 'about.html'}, name='aboutme'),
-
+                       url(r'^job/(?P<server_id>\d+)/(?P<task_name>.*)/$', "job", {'template': 'job.html'}, name='job'),
                        # Uncomment the next line to enable the admin:
                        url(r'^admin/', include(admin.site.urls)),
-)
+                       )
 
 urlpatterns += patterns('GearmanMonitor.apis',
                         url(r'^schart/?(?P<filter_type>[a-zA-Z]*)/?(?P<server_id>\d*)/?(?P<data_length>\d*)$', 'schart',

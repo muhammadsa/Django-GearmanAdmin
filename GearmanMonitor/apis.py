@@ -4,6 +4,8 @@ from gearman.constants import *
 import server as ss
 from .server import *
 import socket
+from .util import *
+
 
 @to_json("api")
 def submit_job(request, server_id, task_name):
@@ -21,8 +23,8 @@ def submit_job(request, server_id, task_name):
     timeout = None
 
     if request.GET:
-        bg = bool(request.GET.get('bg'))
-        wait = bool(int(request.GET.get('wait')))
+        bg = to_bool(request.GET.get('bg'))
+        wait = to_bool(request.GET.get('wait'))
         maxr = int('0' if request.GET.get('maxr') is None else request.GET.get('maxr'))
 
         if request.GET.get('timeout') is not None and request.GET.get('timeout') != r'':

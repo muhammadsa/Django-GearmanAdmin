@@ -4,11 +4,10 @@
         {# workers subscribed for a specific server(s) #}
         {#{{target_server}}#}
         {% include "server_info.html" with value=target_server %} {#don't show status lnk#}
-        {% include "status_info.html" with value=target_server %}
+        {% include "sub/status_info.html" with value=target_server %}
         {% include "sub/modal_close.html" %}
     </div>
     {#<script src="{{ STATIC_URL }}js/servers.js"></script>#}
-
 {% endblock %}
 
 {% block autorefresh %}

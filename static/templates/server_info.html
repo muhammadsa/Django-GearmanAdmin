@@ -45,48 +45,9 @@
     {#value.down_times#}
     {#workers info#}
     {% if status_info %}
-        {% include "status_info.html" with value=value status_info=status_info %}
+        {% include "sub/status_info.html" with value=value status_info=status_info %}
     {% endif %}
     {% if show_graph %}
         {% include "chart.html" with value=value counter=forloop.counter type='servers' %}
     {% endif %}
 </div>
-
-
-{##}
-{#   {% if show_filter %}#}
-{#            <div class="btn-toolbar" role="toolbar">#}
-{#                <div class="btn-group">#}
-{#                    <button type="button" class="btn btn-default"><span class="">Currently</span></button>#}
-{#                    <button type="button" class="btn btn-default"><span class="">Hourly</span></button>#}
-{#                    <button type="button" class="btn btn-default"><span class="">Daily</span></button>#}
-{#                    <button type="button" class="btn btn-default"><span class="">Weekly</span></button>#}
-{#                    <button type="button" class="btn btn-default"><span class="">Monthly</span></button>#}
-{##}
-{#                </div>#}
-{#            </div>#}
-{#        {% endif %}#}
-{##}
-{#        <div id="chartcontainer{{ value.server.id }}">Loading ...</div>#}
-{#        <script type="text/javascript">#}
-{#            var myData = new Array({{value.history|safe}});#}
-{#            var myChart = new JSChart('chartcontainer{{value.server.id}}', 'line');#}
-{#            myChart.setDataArray(myData);#}
-{#            myChart.setAxisNameX('');#}
-{#            myChart.setAxisNameY('');#}
-{#            myChart.setAxisValuesAngle(45);#}
-{#            myChart.setAxisPaddingBottom(50);#}
-{#            var width = $("#server" + "{{ value.server.id }}").width();#}
-{##}
-{#            myChart.setSize(width + 25, 350)#}
-{#            myChart.setTitle('Response times of gearman job server in {{value.server.host}}:{{value.server.port_no}} for today');#}
-{#            {%if value.down_times  %}#}
-{#                var down_times{{value.server.id}} = new Array({{value.down_times | safe}});#}
-{#                //console.log(down_times);#}
-{#                for (var i = 0; i < down_times{{value.server.id}}.length; i++) {#}
-{#                    myChart.setTooltip(down_times{{value.server.id}}[i]);#}
-{#                }#}
-{#            {%endif%}#}
-{##}
-{#            myChart.draw();#}
-{#        </script>#}

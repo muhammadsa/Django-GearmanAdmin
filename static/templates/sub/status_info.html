@@ -6,7 +6,10 @@
         {% for worker in value.status_response %}
             <tr>
                 <td><b>task: </b></td>
-                <td> {{ worker.task }}</td>
+                <td> {{ worker.task }}
+                    <a form_url="{% url 'job' target_server.server.id worker.task %}" href="#" class="submit_job"
+                       style="display: block; float: right">Submit Job</a>
+                </td>
             </tr>
             <tr>
                 <td>subscribed workers count:</td>
@@ -22,7 +25,9 @@
             </tr>
         {% endfor %}
     {% else %}
-        <tr class="bg-warning"><td colspan="2">No workers here</td> </tr>
+        <tr class="bg-warning">
+            <td colspan="2">No workers here</td>
+        </tr>
     {% endif %}
 
 </table>

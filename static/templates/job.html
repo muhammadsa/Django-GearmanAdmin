@@ -1,0 +1,127 @@
+<br/>
+<div class="submit_dv">
+    <table class="table table-bordered">
+        <tr>
+            <th colspan="2">
+                Submit Job to a worker named "{{ task_name }}"
+            </th>
+        </tr>
+        <tr>
+            <td>Server</td>
+            <td>{{ server_id }}</td>
+        </tr>
+        <tr>
+            <td>Task Name</td>
+            <td>{{ task_name }}</td>
+        </tr>
+        <tr>
+            <td>
+                Workload
+            </td>
+            <td>
+                <textarea id="workload" rows="3" cols="65"></textarea>
+
+            </td>
+        </tr>
+        <tr>
+            <td>Options</td>
+            <td>
+                <input type="checkbox" id="bg_chk" name="bg"/> <label for="bg_chk">Run job in background?</label><br/>
+                <input type="checkbox" id="wait_chk" name="wait" checked="checked"/> <label for="wait_chk">Wait job
+                until
+                its completion?</label><br/>
+                <label for="maxr_txt">Max Retries:</label><br/><input type="text" id="maxr_txt"/>
+            </td>
+        </tr>
+    </table>
+
+    <div style="text-align: right">
+        <button id="submit_btn" class="btn btn-primary submit_job_btn">Submit</button>
+        <button id="submit_btn" class="btn btn_cancel">Cancel</button>
+    </div>
+</div>
+<style>
+    .notifyjs-foo-base {
+        opacity: 0.85;
+        width: 200px;
+        background: #F5F5F5;
+        padding: 5px;
+        border-radius: 10px;
+    }
+
+    .notifyjs-foo-base .title {
+        width: 100px;
+        float: left;
+        margin: 10px 0 0 10px;
+        text-align: right;
+    }
+
+    .notifyjs-foo-base .buttons {
+        width: 70px;
+        float: right;
+        font-size: 9px;
+        padding: 5px;
+        margin: 2px;
+    }
+
+    .notifyjs-foo-base button {
+        font-size: 9px;
+        padding: 5px;
+        margin: 2px;
+        width: 60px;
+    }
+
+</style>
+<script>
+    $(".submit_job_btn").click(function (e) {
+        e.preventDefault();
+        //POST
+        //var bg = $('#bg_chk:checked').val();
+        var bg = $('#bg_chk').is(':checked');
+        var wait = $('#wait_chk').is(':checked');
+        console.log(bg + "/" + wait);
+        var work_load = $("#workload").val();
+        var maxr = $("#maxr_txt").val();
+
+        var bg_qs = (bg != null && bg != 'undefined' ? "bg=" + bg : '');
+        var wait_qs = (wait != null && wait != 'undefined' ? "wait=" + wait : '');
+        var maxr_qs = (maxr != null && maxr != 'undefined' && maxr != '' ? "max=" + maxr : '');
+
+        var qs = '';
+        if (bg_qs != '')
+            qs += bg_qs;
+        if (qs != '' && wait_qs != '')
+            qs += "&" + wait_qs;
+        else
+            qs += wait_qs;
+
+        if (qs != '' && maxr_qs != '')
+            qs += "&" + maxr_qs;
+        else
+            qs += maxr_qs;
+
+        if (qs != '')
+            qs = "?" + qs;
+        console.log('/sjob/{{ server_id }}/{{ task_name }}/' + qs);
+        console.log(" www  " + work_load);
+        $("#workload").val('');
+
+        xAjax.postWithLoadTarget('/sjob/{{ server_id }}/{{ task_name }}/' + qs,
+                work_load,
+                $(".submit_dv"), function (data) {
+
+
+                    if (data != null && data != 'undefined') {
+                        //$.notify(data.result, "success");
+                        $.notify(data.data.result, "success");
+                    }
+                });
+
+        //$.modal.close();
+    });
+
+
+    $(".btn_cancel").click(function (e) {
+        $.modal.close();
+    });
+</script>

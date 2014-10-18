@@ -116,7 +116,6 @@ $('a.fast_refresh').click(function (e) {
     var data_length = parseInt($this.attr('data_length'));
     var filter_type = $this.closest("div.row").find('input[type="radio"]:checked').val().split('_')[1];
     //call ajax to refresh the chart and to update database...
-    //console.log($server);
     //HTTP call: /schart/?id=1
     //xAjax.getWithLoadTarget('/schart', {id: $server}, null, function (data) {
     console.log('start ajax get');
@@ -152,12 +151,12 @@ function recursive_modal($this) {
                 //console.log('show');
                 $('#simplemodal-container1 .simplemodal-data').html(data);
                 if (data)
-                    $('#simplemodal-container1 .simplemodal-data').find("a.workers").click(function (e) {
-
+                    $('#simplemodal-container1 .simplemodal-data').find("a.workers,a.submit_job").click(function (e) {
                         e.preventDefault();
                         $.modal.close();
                         recursive_modal($(this));
-                    })
+                    });
+
             });
             $(dlg.container).css('height', 'auto');
         },
@@ -167,11 +166,11 @@ function recursive_modal($this) {
     });
 }
 
+
 $("a.details,a.workers").click(function (e) {
     e.preventDefault();
     recursive_modal($(this));
 });
-
 
 $("a.delete_server").click(function (e) {
     e.preventDefault();

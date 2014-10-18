@@ -182,3 +182,8 @@ def server_stats(request, template):
 
 def aboutme(request, template):
     return render_to_response(template, context_instance=RequestContext(request))
+
+
+def job(request, template, server_id, task_name):
+    return render_to_response(template,{'server_id': server_id, 'task_name': task_name},
+                              context_instance=RequestContext(request))
