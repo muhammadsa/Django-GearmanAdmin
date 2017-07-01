@@ -21,10 +21,4 @@ License
 -------
 Apache License, Version 2.0 
 
-Donations
---------- 
-If you like it please support us and donate: 
-
-- http://spacegitengineering.blogspot.com/2014/10/new-gearman-admin-django-based-interface.html
-- http://spacegitengineering.wordpress.com/2014/10/13/new-gearman-admin-django-based-interface/
-
+ 
